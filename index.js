@@ -1,14 +1,12 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const express = require('express');
-const cors = require('cors');
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const express = require("express");
+const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
-require('dotenv').config()
-
-
+require("dotenv").config();
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.hgwvewl.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -18,7 +16,7 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 });
 
 async function run() {
@@ -27,20 +25,61 @@ async function run() {
     await client.connect();
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
   } finally {
     // Ensures that the client will close when you finish/error
-//     await client.close();
+    //     await client.close();
   }
 }
 run().catch(console.dir);
 
+const database = client.db("foodsharingdatabse");
 
+const foodAddedCollection = database.collection("addedFood");
 
-
-app.get('/', (req, res) => {
-     res.send('server is running')
+app.get('/addedFoodData', async(req, res) => {
+  try{
+    const result = await foodAddedCollection.find().sort({ "Food_Quantity": -1 }).toArray();
+  res.send(result);
+  }
+  catch(error){
+    console.log(error)
+  }
 })
+app.get('/addedFoodDataFindToExpiredDate', async(req, res) => {
+  try{
+    const result = await foodAddedCollection.find().sort({ "Expired_Date_Time": 1 }).toArray();
+  res.send(result);
+  }
+  catch(error){
+    console.log(error)
+  }
+})
+
+app.get('/addedFoodData/:id', async(req, res) => {
+  const id = req.params.id
+  const query = { _id: new ObjectId(id) };
+  const result = await foodAddedCollection.findOne(query);
+  res.send(result)
+})
+
+
+app.post("/addedFood", async (req, res) => {
+  try{
+     const body = req.body;
+     const result = await foodAddedCollection.insertOne(body);
+     res.send(result)
+  }
+  catch(error){
+     console.log(error)
+  }
+});
+
+app.get("/", (req, res) => {
+  res.send("server is running");
+});
 app.listen(port, () => {
-     console.log(`server is running${port}`)
-})
+  console.log(`server is running${port}`);
+});
