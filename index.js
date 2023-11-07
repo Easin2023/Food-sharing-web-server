@@ -90,6 +90,14 @@ app.post('/foodRequest', async(req, res) => {
   }
 })
 
+
+app.delete('/addedFoodData/:id', async(req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) }
+  const result = await foodAddedCollection.deleteOne(query);
+  res.send(result)
+})
+
 app.get("/", (req, res) => {
   res.send("server is running");
 });
