@@ -38,6 +38,7 @@ run().catch(console.dir);
 const database = client.db("foodsharingdatabse");
 
 const foodAddedCollection = database.collection("addedFood");
+const foodRequestCollection = database.collection("foodRequest");
 
 app.get('/addedFoodData', async(req, res) => {
   try{
@@ -76,6 +77,18 @@ app.post("/addedFood", async (req, res) => {
      console.log(error)
   }
 });
+
+app.post('/foodRequest', async(req, res) => {
+  try{
+    const body = req.body;
+  const result = await foodRequestCollection.insertOne(body);
+  res.send(result)
+  }
+  catch(error){
+    console.log(error)
+    res.send({error})
+  }
+})
 
 app.get("/", (req, res) => {
   res.send("server is running");
