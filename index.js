@@ -90,6 +90,17 @@ app.post('/foodRequest', async(req, res) => {
   }
 })
 
+app.put('/updateFoodData/:id', async(req, res) => {
+  try{
+    const id = req.params.id
+    const body = req.body;
+    console.log(id, body)
+  }
+  catch(error){
+    console.log(error)
+  }
+})
+
 
 app.delete('/addedFoodData/:id', async(req, res) => {
   const id = req.params.id;
