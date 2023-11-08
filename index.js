@@ -40,74 +40,86 @@ const database = client.db("foodsharingdatabse");
 const foodAddedCollection = database.collection("addedFood");
 const foodRequestCollection = database.collection("foodRequest");
 
-app.get('/addedFoodData', async(req, res) => {
-  try{
-    const result = await foodAddedCollection.find().sort({ "Food_Quantity": -1 }).toArray();
-  res.send(result);
+app.get("/addedFoodData", async (req, res) => {
+  try {
+    const result = await foodAddedCollection
+      .find()
+      .sort({ Food_Quantity: -1 })
+      .toArray();
+    res.send(result);
+  } catch (error) {
+    console.log(error);
   }
-  catch(error){
-    console.log(error)
-  }
-})
-app.get('/addedFoodDataFindToExpiredDate', async(req, res) => {
-  try{
-    const result = await foodAddedCollection.find().sort({ "Expired_Date_Time": 1 }).toArray();
-  res.send(result);
-  }
-  catch(error){
-    console.log(error)
-  }
-})
-
-app.get('/addedFoodData/:id', async(req, res) => {
-  const id = req.params.id
-  const query = { _id: new ObjectId(id) };
-  const result = await foodAddedCollection.findOne(query);
-  res.send(result)
-})
-
-
-app.post("/addedFood", async (req, res) => {
-  try{
-     const body = req.body;
-     const result = await foodAddedCollection.insertOne(body);
-     res.send(result)
-  }
-  catch(error){
-     console.log(error)
+});
+app.get("/addedFoodDataFindToExpiredDate", async (req, res) => {
+  try {
+    const result = await foodAddedCollection
+      .find()
+      .sort({ Expired_Date_Time: 1 })
+      .toArray();
+    res.send(result);
+  } catch (error) {
+    console.log(error);
   }
 });
 
-app.post('/foodRequest', async(req, res) => {
-  try{
-    const body = req.body;
-  const result = await foodRequestCollection.insertOne(body);
-  res.send(result)
-  }
-  catch(error){
-    console.log(error)
-    res.send({error})
-  }
-})
-
-app.put('/updateFoodData/:id', async(req, res) => {
-  try{
-    const id = req.params.id
-    const body = req.body;
-    console.log(id, body)
-  }
-  catch(error){
-    console.log(error)
-  }
-})
-
-
-app.delete('/addedFoodData/:id', async(req, res) => {
+app.get("/addedFoodData/:id", async (req, res) => {
   const id = req.params.id;
-  const query = { _id: new ObjectId(id) }
+  const query = { _id: new ObjectId(id) };
+  const result = await foodAddedCollection.findOne(query);
+  res.send(result);
+});
+
+app.post("/addedFood", async (req, res) => {
+  try {
+    const body = req.body;
+    const result = await foodAddedCollection.insertOne(body);
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.post("/foodRequest", async (req, res) => {
+  try {
+    const body = req.body;
+    const result = await foodRequestCollection.insertOne(body);
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    res.send({ error });
+  }
+});
+
+app.put("/updateFoodData/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const body = req.body;
+    const query = { _id: new ObjectId(id) };
+    const updateDoc = {
+      $set: {
+        Food_Image: body.FoodImage,
+        Food_Name: body.FoodName, 
+        Food_Quantity: body.FoodQuantity,
+        Pickup_Location: body.PickupLocation,
+        Expired_Date_Time: body.ExpiredDate,
+        Additional_Notes: body.AdditionalNotes
+      },
+    };
+    const result = await foodAddedCollection.updateOne(query, updateDoc);
+    res.send(result);
+    // console.log(body)
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.delete("/addedFoodData/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
   const result = await foodAddedCollection.deleteOne(query);
-  res.send(result)
-})
+  res.send(result);
+});
 
 app.get("/", (req, res) => {
   res.send("server is running");
