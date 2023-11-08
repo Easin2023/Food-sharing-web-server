@@ -42,10 +42,13 @@ const foodRequestCollection = database.collection("foodRequest");
 
 app.get("/addedFoodData", async (req, res) => {
   try {
-    const result = await foodAddedCollection
-      .find()
-      .sort({ Food_Quantity: -1 })
-      .toArray();
+    // console.log(req.query);
+    let query = {};  // Change 'const' to 'let'
+    if (req.query?.email) {
+      query = { email: req.query.email };
+    }
+    const result = await foodAddedCollection.find(query).sort({ Food_Quantity: -1 }).toArray();
+    // console.log(query)
     res.send(result);
   } catch (error) {
     console.log(error);
@@ -70,15 +73,22 @@ app.get("/addedFoodData/:id", async (req, res) => {
   res.send(result);
 });
 
+
 app.post("/addedFood", async (req, res) => {
   try {
     const body = req.body;
+    // console.log(body)
     const result = await foodAddedCollection.insertOne(body);
     res.send(result);
   } catch (error) {
     console.log(error);
   }
 });
+
+app.get('/foodRequest', async(req, res) => {
+  const result = await foodRequestCollection.find().toArray();
+  res.send(result)
+})
 
 app.post("/foodRequest", async (req, res) => {
   try {
