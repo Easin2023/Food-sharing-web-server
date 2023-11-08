@@ -86,7 +86,11 @@ app.post("/addedFood", async (req, res) => {
 });
 
 app.get('/foodRequest', async(req, res) => {
-  const result = await foodRequestCollection.find().toArray();
+  let query = {};
+  if(req.query?.email){
+    query = { email: req.query.email };
+  }
+  const result = await foodRequestCollection.find(query).toArray();
   res.send(result)
 })
 
