@@ -8,10 +8,10 @@ const port = process.env.PORT || 5000;
 
 app.use(
   cors(
-  //   {
-  //   origin: ["http://localhost:5173"],
-  //   credentials: true,
-  // }
+    {
+    origin: ["http://localhost:5173"],
+    credentials: true,
+  }
   )
 );
 app.use(cookieParser());
@@ -50,20 +50,20 @@ const database = client.db("foodsharingdatabse");
 const foodAddedCollection = database.collection("addedFood");
 const foodRequestCollection = database.collection("foodRequest");
 
-// app.post("/jwt", async (req, res) => {
-//   try {
-//     const body = req.body;
-//     const token = jwt.sign(body, process.env.JWT_TOKEN, { expiresIn: "1h" });
-//     res
-//       .cookie("token", token, {
-//         httpOnly: true,
-//         secure: false,
-//       })
-//       .send({ success: true });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// });
+app.post("/jwt", async (req, res) => {
+  try {
+    const body = req.body;
+    const token = jwt.sign(body, process.env.JWT_TOKEN, { expiresIn: "1h" });
+    res
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: false,
+      })
+      .send({ success: true });
+  } catch (error) {
+    console.log(error);
+  }
+});
 app.get("/addedFoodData", async (req, res) => {
   try {
     // console.log(req.query);
