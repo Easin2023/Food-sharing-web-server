@@ -1,10 +1,20 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
+const cookieParser = require("express");
+const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(
+  cors(
+  //   {
+  //   origin: ["http://localhost:5173"],
+  //   credentials: true,
+  // }
+  )
+);
+app.use(cookieParser());
 app.use(express.json());
 require("dotenv").config();
 
@@ -40,14 +50,31 @@ const database = client.db("foodsharingdatabse");
 const foodAddedCollection = database.collection("addedFood");
 const foodRequestCollection = database.collection("foodRequest");
 
+// app.post("/jwt", async (req, res) => {
+//   try {
+//     const body = req.body;
+//     const token = jwt.sign(body, process.env.JWT_TOKEN, { expiresIn: "1h" });
+//     res
+//       .cookie("token", token, {
+//         httpOnly: true,
+//         secure: false,
+//       })
+//       .send({ success: true });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
 app.get("/addedFoodData", async (req, res) => {
   try {
     // console.log(req.query);
-    let query = {};  // Change 'const' to 'let'
+    let query = {}; // Change 'const' to 'let'
     if (req.query?.email) {
       query = { email: req.query.email };
     }
-    const result = await foodAddedCollection.find(query).sort({ Food_Quantity: -1 }).toArray();
+    const result = await foodAddedCollection
+      .find(query)
+      .sort({ Food_Quantity: -1 })
+      .toArray();
     // console.log(query)
     res.send(result);
   } catch (error) {
@@ -85,27 +112,26 @@ app.post("/addedFood", async (req, res) => {
   }
 });
 
-app.get('/foodRequest/:id', async(req, res) => {
-  try{
-    const id = req.params.id
+app.get("/foodRequest/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
     const query = { _id: new ObjectId(id) };
     const result = await foodRequestCollection.findOne(query);
-    res.send(result)
+    res.send(result);
+  } catch (error) {
+    console.log(error);
   }
-  catch(error){
-    console.log(error)
-  }
-})
+});
 
-app.get('/foodRequest', async(req, res) => {
-  console.log(req.query)
+app.get("/foodRequest", async (req, res) => {
+  console.log(req.query);
   let query = {};
-  if(req.query?.email){
-    query = { email: req.query.email, name: req.query.name };
+  if (req.query?.email) {
+    query = { email: req.query.email };
   }
   const result = await foodRequestCollection.find(query).toArray();
-  res.send(result)
-})
+  res.send(result);
+});
 
 app.post("/foodRequest", async (req, res) => {
   try {
@@ -118,26 +144,26 @@ app.post("/foodRequest", async (req, res) => {
   }
 });
 
-app.put('/foodRequest/:id', async(req, res) => {
+app.put("/foodRequest/:id", async (req, res) => {
   const id = req.params.id;
   const body = req.body;
-  console.log(body)
-  const query = { _id: new ObjectId(id) }
+  console.log(body);
+  const query = { _id: new ObjectId(id) };
   const setDoc = {
     $set: {
-      status: body.status
-    }
-  }
-  const result = await foodRequestCollection.updateOne(query, setDoc)
-  res.send(result)
-})
+      status: body.status,
+    },
+  };
+  const result = await foodRequestCollection.updateOne(query, setDoc);
+  res.send(result);
+});
 
-app.delete('/foodRequest/:id', async(req, res) => {
+app.delete("/foodRequest/:id", async (req, res) => {
   const id = req.params.id;
   const query = { _id: new ObjectId(id) };
   const result = await foodRequestCollection.deleteOne(query);
-  res.send(result)
-})
+  res.send(result);
+});
 
 app.put("/updateFoodData/:id", async (req, res) => {
   try {
@@ -147,11 +173,11 @@ app.put("/updateFoodData/:id", async (req, res) => {
     const updateDoc = {
       $set: {
         Food_Image: body.FoodImage,
-        Food_Name: body.FoodName, 
+        Food_Name: body.FoodName,
         Food_Quantity: body.FoodQuantity,
         Pickup_Location: body.PickupLocation,
         Expired_Date_Time: body.ExpiredDate,
-        Additional_Notes: body.AdditionalNotes
+        Additional_Notes: body.AdditionalNotes,
       },
     };
     const result = await foodAddedCollection.updateOne(query, updateDoc);
