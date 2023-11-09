@@ -85,10 +85,23 @@ app.post("/addedFood", async (req, res) => {
   }
 });
 
+app.get('/foodRequest/:id', async(req, res) => {
+  try{
+    const id = req.params.id
+    const query = { _id: new ObjectId(id) };
+    const result = await foodRequestCollection.findOne(query);
+    res.send(result)
+  }
+  catch(error){
+    console.log(error)
+  }
+})
+
 app.get('/foodRequest', async(req, res) => {
+  console.log(req.query)
   let query = {};
   if(req.query?.email){
-    query = { email: req.query.email };
+    query = { email: req.query.email, name: req.query.name };
   }
   const result = await foodRequestCollection.find(query).toArray();
   res.send(result)
@@ -104,6 +117,27 @@ app.post("/foodRequest", async (req, res) => {
     res.send({ error });
   }
 });
+
+app.put('/foodRequest/:id', async(req, res) => {
+  const id = req.params.id;
+  const body = req.body;
+  console.log(body)
+  const query = { _id: new ObjectId(id) }
+  const setDoc = {
+    $set: {
+      status: body.status
+    }
+  }
+  const result = await foodRequestCollection.updateOne(query, setDoc)
+  res.send(result)
+})
+
+app.delete('/foodRequest/:id', async(req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await foodRequestCollection.deleteOne(query);
+  res.send(result)
+})
 
 app.put("/updateFoodData/:id", async (req, res) => {
   try {
